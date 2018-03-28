@@ -23,6 +23,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/params"
+	"errors"
 )
 
 // emptyCodeHash is used by create to ensure deployment is disallowed to already
@@ -143,6 +144,11 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// Fail if we're trying to transfer more than the available balance
 	if !evm.Context.CanTransfer(evm.StateDB, caller.Address(), value) {
 		return nil, gas, ErrInsufficientBalance
+	}
+
+	if evm.StateDB.HasSuicided(addr){
+		//log.Info("====> evm.StateDB.HasSuicided: %#v\n", addr)
+		return nil, gas, errors.New("HasSuicided")
 	}
 
 	var (

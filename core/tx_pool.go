@@ -568,6 +568,9 @@ func (pool *TxPool) AddRemotes(txs []*types.Transaction) error {
 
 // addTx enqueues a single transaction into the pool if it is valid.
 func (pool *TxPool) addTx(tx *types.Transaction, local bool) error {
+	// force cache From of sender before lock
+	types.Sender(pool.signer, tx)
+
 	pool.mu.Lock()
 	defer pool.mu.Unlock()
 

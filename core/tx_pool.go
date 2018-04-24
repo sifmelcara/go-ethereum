@@ -34,6 +34,9 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"gopkg.in/karalabe/cookiejar.v2/collections/prque"
 	rpcClient "github.com/tendermint/tendermint/rpc/client"
+	"github.com/tendermint/go-wire/data"
+	"github.com/tendermint/go-wire"
+	pgkErrors "github.com/pkg/errors"
 )
 
 var (
@@ -102,6 +105,14 @@ var (
 	invalidTxCounter     = metrics.NewCounter("txpool/invalid")
 	//underpricedTxCounter = metrics.NewCounter("txpool/underpriced")
 )
+
+var errNoData = fmt.Errorf("No data returned for query")
+
+
+func ErrNoData() error {
+	return pgkErrors.WithStack(errNoData)
+}
+
 
 type stateFn func() (*state.StateDB, error)
 
@@ -532,7 +543,7 @@ func (pool *TxPool) promoteTx(addr common.Address, hash common.Hash, tx *types.T
 	pool.pendingState.SetNonce(addr, tx.Nonce()+1)
 
 	if pool.tmClient != nil {
-		return pool.broadcastTx(tx)
+		return pool.BroadcastTx(tx)
 	}
 	pool.eventMux.Post(TxPreEvent{tx})
 	return nil
@@ -946,7 +957,7 @@ func (pool *TxPool) SetTMClient(client *rpcClient.Local) {
 	pool.tmClient = client
 }
 
-func (pool *TxPool) broadcastTx(tx *types.Transaction) error {
+func (pool *TxPool) BroadcastTx(tx *types.Transaction) error {
 	buf := new(bytes.Buffer)
 	if err := tx.EncodeRLP(buf); err != nil {
 		return err
@@ -963,6 +974,26 @@ func (pool *TxPool) broadcastTx(tx *types.Transaction) error {
 		return errors.New(result.Log)
 	}
 	return nil
+}
+
+func (pool *TxPool) GetNonce(addr common.Address) (uint64, error) {
+	pool.mu.Lock()
+	pool.mu.Unlock()
+	if pool.tmClient == nil {
+		return pool.State().GetNonce(addr), nil
+	} else {
+		var nonce uint64 = 0
+		resp, err := pool.tmClient.ABCIQueryWithOptions("/nonce", addr.Bytes(), rpcClient.DefaultABCIQueryOptions)
+		if resp == nil {
+			return 0, err
+		}
+		if len(resp.Response.Value) > 0 {
+			wire.ReadBinaryBytes(data.Bytes(resp.Response.Value), &nonce)
+			return nonce, err
+		} else {
+			return 0, ErrNoData()
+		}
+	}
 }
 
 // addressByHeartbeat is an account address tagged with its last activity timestamp.

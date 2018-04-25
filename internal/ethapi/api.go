@@ -1382,12 +1382,6 @@ func (s *PublicTransactionPoolAPI) Resend(ctx context.Context, sendArgs SendTxAr
 	return common.Hash{}, fmt.Errorf("Transaction %#x not found", matchTx.Hash())
 }
 
-// GetBalance return nonce of CheckState(CheckTx included)
-func (s *PublicTransactionPoolAPI) GetNonce(ctx context.Context, address common.Address, blockNr rpc.BlockNumber) (uint64, error) {
-	return s.b.GetPoolNonce(ctx, address)
-}
-
-
 // PublicDebugAPI is the collection of Etheruem APIs exposed over the public
 // debugging endpoint.
 type PublicDebugAPI struct {

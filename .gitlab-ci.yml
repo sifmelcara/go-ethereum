@@ -1,11 +1,40 @@
 image: registry-cybermiles.skymizer.com/cybermiles/environment:ci
 
+stages:
+  - lint
+  - build
+  - test
+
 before_script:
+  # download latest libeni.so
   - mkdir -p ~/.ethereum/eni/lib
   - curl -vL -o ~/.ethereum/eni/lib/libeni.so --header "Private-Token:"$PRIVATE_TOKEN "https://git-cybermiles.skymizer.com/cybermiles/libeni/-/jobs/artifacts/master/raw/libeni.so?job=deploy"
   - file ~/.ethereum/eni/lib/libeni.so
 
+lint:
+  stage: lint
+  script:
+    # lint command reference: https://github.com/ethereum/go-ethereum/blob/master/build/ci.go
+    - build/env.sh go get gopkg.in/alecthomas/gometalinter.v2
+    - build/env.sh build/_workspace/bin/gometalinter.v2 --install
+    - build/env.sh build/_workspace/bin/gometalinter.v2 --vendor --tests --disable-all --enable=goimports --enable=varcheck --enable=vet --enable=gofmt --enable=misspell --enable=goconst --min-occurrences=6 ./core/vm/...
+
 build:
   stage: build
+  cache:
+    paths:
+      - build
+    policy: push
   script:
-    - make evm
+    - make all
+
+test:
+  stage: test
+  cache:
+    paths:
+      - build
+    policy: pull
+  script:
+    # only test core/vm and its sub-packages
+    - export CGO_LDFLAGS="-L$HOME/.ethereum/eni/lib -Wl,-rpath,$HOME/.ethereum/eni/lib"
+    - build/env.sh go run build/ci.go test -coverage ./core/vm/...

@@ -7,9 +7,9 @@ stages:
 
 before_script:
   # download latest libeni.so
-  - mkdir -p ~/.ethereum/eni/lib
-  - curl -vL -o ~/.ethereum/eni/lib/libeni.so --header "Private-Token:"$PRIVATE_TOKEN "https://git-cybermiles.skymizer.com/cybermiles/libeni/-/jobs/artifacts/master/raw/libeni.so?job=deploy"
-  - file ~/.ethereum/eni/lib/libeni.so
+  - mkdir -p ~/.travis/eni/lib
+  - curl -vL -o ~/.travis/eni/lib/libeni.so --header "Private-Token:"$PRIVATE_TOKEN "https://git-cybermiles.skymizer.com/cybermiles/libeni/-/jobs/artifacts/master/raw/libeni.so?job=deploy"
+  - file ~/.travis/eni/lib/libeni.so
 
 lint:
   stage: lint
@@ -36,5 +36,5 @@ test:
     policy: pull
   script:
     # only test core/vm and its sub-packages
-    - export CGO_LDFLAGS="-L$HOME/.ethereum/eni/lib -Wl,-rpath,$HOME/.ethereum/eni/lib"
+    - export CGO_LDFLAGS="-L$HOME/.travis/eni/lib -Wl,-rpath,$HOME/.travis/eni/lib"
     - build/env.sh go run build/ci.go test -coverage ./core/vm/...

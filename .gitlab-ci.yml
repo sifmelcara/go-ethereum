@@ -4,6 +4,7 @@ stages:
   - lint
   - build
   - test
+  - deploy
 
 before_script:
   # download latest libeni.so
@@ -38,3 +39,18 @@ test:
     # only test core/vm and its sub-packages
     - export CGO_LDFLAGS="-L$HOME/.travis/eni/lib -Wl,-rpath,$HOME/.travis/eni/lib"
     - build/env.sh go run build/ci.go test -coverage ./core/vm/...
+
+deploy:
+  stage: deploy
+  cache:
+    paths:
+      - build
+    policy: pull
+  script:
+    - cp build/bin/evm .
+    - cp build/bin/geth .
+  artifacts:
+    paths:
+      - evm
+      - geth
+    expire_in: 1 month

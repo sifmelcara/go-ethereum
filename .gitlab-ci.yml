@@ -5,6 +5,7 @@ stages:
   - build
   - test
   - deploy
+  - regression
 
 before_script:
   # download latest libeni.so
@@ -54,3 +55,8 @@ deploy:
       - evm
       - geth
     expire_in: 1 month
+
+regression:
+  stage: regression
+  script:
+    - curl -s -X POST -F "token=$REGRESSION_TRIGGER_TOKEN" -F ref=master https://git-cybermiles.skymizer.com/api/v4/projects/14/trigger/pipeline | jq .

@@ -39,6 +39,7 @@ test:
   script:
     # only test core/vm and its sub-packages
     - export CGO_LDFLAGS="-L$HOME/.travis/eni/lib -Wl,-rpath,$HOME/.travis/eni/lib"
+    - export CGO_LDFLAGS_ALLOW="-I.*"
     - build/env.sh go run build/ci.go test -coverage ./core/vm/...
 
 deploy:

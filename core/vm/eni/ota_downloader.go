@@ -252,7 +252,7 @@ func getLibPath() (libPath string, err error) {
 }
 
 // Download the library from given url. The library will
-// be saved in ENI_LIBRARY_PATH/staging named OTAInfo.libName.
+// be saved in ENI_LIBRARY_PATH/staging named OTAInfo.LibName.
 func (ota *OTAInstance) downloadFromUrl(info OTAInfo) (err error) {
 	// If file is existed, we don't need to download it again.
 	fileName := filepath.Join(ota.stagingLibPath, generateFileName(info))

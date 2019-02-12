@@ -161,7 +161,8 @@ eni_return_data fork_call(
         }
     }
     else if (WIFSIGNALED(child_status)) {
-        switch (WTERMSIG(child_status)) {
+        int sig = WTERMSIG(child_status);
+        switch (sig) {
             case SIGSEGV:
                 *status = ENI_SEGFAULT;
                 break;
@@ -171,6 +172,7 @@ eni_return_data fork_call(
             default:
                 *status = ENI_FAILURE;
                 fprintf(stderr, "ENI_FAILURE AAA %d AAA\n", __LINE__);
+                fprintf(stderr, "signal = ", strsignal(sig));
         }
         free(child_exe_result);
         return NULL;

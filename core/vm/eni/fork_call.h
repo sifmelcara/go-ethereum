@@ -115,7 +115,7 @@ eni_return_data fork_call(
     }
     if (fcntl(pfd[0], F_SETFL, O_NONBLOCK) < 0) {
         *status = ENI_FAILURE;
-        fprintf(stderr, "ENI_FAILURE AAA %s AAA\n", __LINE__);
+        fprintf(stderr, "ENI_FAILURE AAA %d AAA\n", __LINE__);
         close(pfd[0]);
         close(pfd[1]);
         return NULL;
@@ -124,7 +124,7 @@ eni_return_data fork_call(
     int pid;
     if ((pid = eni_fork_child(get_result_len, exe, f, args_text, pfd[1])) < 0) {
         *status = ENI_FAILURE; // failed to fork a child
-        fprintf(stderr, "ENI_FAILURE AAA %s AAA\n", __LINE__);
+        fprintf(stderr, "ENI_FAILURE AAA %d AAA\n", __LINE__);
         close(pfd[0]);
         close(pfd[1]);
         return NULL;
@@ -144,7 +144,7 @@ eni_return_data fork_call(
     int child_status;
     if (waitpid(pid, &child_status, WNOHANG) == -1) {
         *status = ENI_FAILURE;
-        fprintf(stderr, "ENI_FAILURE AAA %s AAA\n", __LINE__);
+        fprintf(stderr, "ENI_FAILURE AAA %d AAA\n", __LINE__);
         free(child_exe_result);
         return NULL;
     }
@@ -170,7 +170,7 @@ eni_return_data fork_call(
                 break;
             default:
                 *status = ENI_FAILURE;
-                fprintf(stderr, "ENI_FAILURE AAA %s AAA\n", __LINE__);
+                fprintf(stderr, "ENI_FAILURE AAA %d AAA\n", __LINE__);
         }
         free(child_exe_result);
         return NULL;
@@ -295,7 +295,7 @@ eni_return_data wait_and_read_from_child(int pid, int pfd, int* eni_status) {
 
 unclassified_error:
     *eni_status = ENI_FAILURE;
-    fprintf(stderr, "ENI_FAILURE AAA %s AAA\n", __LINE__);
+    fprintf(stderr, "ENI_FAILURE AAA %d AAA\n", __LINE__);
 error:
     free(ret);
     ret = NULL;

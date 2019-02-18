@@ -192,7 +192,7 @@ void sig_handler(int signo, siginfo_t *si, void *data) {
   printf("AAA Signal %d from pid %d\n", (int)si->si_signo, pid);
   char cmd[999];
   sprintf(cmd, "ps -p %d -o comm= ", pid);
-  (void)system(cmd);
+  printf("system return %d\n", system(cmd));
   exit(0);
 }
 

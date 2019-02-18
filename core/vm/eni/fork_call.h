@@ -200,8 +200,8 @@ int set_up_sandbox(int pipefd) {
             if (close(i) == -1)
                 return ENI_RESOURCE_BUSY;
     }
-    if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT) != 0)
-        return ENI_SECCOMP_FAIL;
+    //if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT) != 0)
+    //    return ENI_SECCOMP_FAIL;
     return 0;
 }
 

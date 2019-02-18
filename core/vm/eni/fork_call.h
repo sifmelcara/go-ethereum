@@ -184,12 +184,25 @@ eni_return_data fork_call(
     }
 }
 
+
+void sig_handler(int signo, siginfo_t *si, void *data) {
+  (void)signo;
+  (void)data;
+  int pid = si->si_pid;
+  printf("AAA Signal %d from pid %d\n", (int)si->si_signo, pid);
+  char cmd[999];
+  sprintf(cmd, "ps -p %d -o comm= ", pid);
+  (void)system(cmd);
+  exit(0);
+}
+
 int set_up_sandbox(int pipefd) {
     if (FD_SETSIZE > 1e+4) {
         // Unless user specifically configured and recompile the kernel himself/herself,
         // FD_SETSIZE should equal to 1024 and checking the status of all FDs should be an acceptable impl
         fprintf(stderr, "ENI Warning: FD_SETSIZE=%d, which is abnormally big\n", FD_SETSIZE);
     }
+    /*
     for (int i = 0 ; i != FD_SETSIZE ; i++) {
         if (i == pipefd) {
             // we will use this file descriptor to communicate with parent process
@@ -199,9 +212,21 @@ int set_up_sandbox(int pipefd) {
         if (fcntl(i, F_GETFL) != -1)
             if (close(i) == -1)
                 return ENI_RESOURCE_BUSY;
-    }
+    }*/
     //if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT) != 0)
     //    return ENI_SECCOMP_FAIL;
+
+    for (int i = 1 ; i < 128 ; i++) {
+        struct sigaction sa;
+        memset(&sa, 0, sizeof(sa));
+
+        sa.sa_flags = SA_SIGINFO;
+        sa.sa_sigaction = sig_handler;
+        if (sigaction(i, &sa, 0) == -1) {
+            fprintf(stderr, "AAA %s: %s\n", "sigaction", strerror(errno));
+        }
+    }
+
     return 0;
 }
 

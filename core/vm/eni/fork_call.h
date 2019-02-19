@@ -327,7 +327,7 @@ eni_return_data wait_and_read_from_child(int pid, int pfd, int* eni_status) {
         else if (nread == 0) { // EOF
             struct timespec tim;
             tim.tv_sec  = 0;
-            tim.tv_nsec = 100000000L; // 0.1 second
+            tim.tv_nsec = 500000000L; // 0.5 second
             nanosleep(&tim, NULL);
 
             goto end;

@@ -173,6 +173,9 @@ eni_return_data fork_call(
                 *status = ENI_FAILURE;
                 fprintf(stderr, "ENI_FAILURE AAA %d AAA\n", __LINE__);
                 fprintf(stderr, "signal = %s\n", strsignal(sig));
+                fprintf(stderr, "regard it as normal termination anyway.\n");
+                *status = ENI_SUCCESS;
+                return child_exe_result;
         }
         free(child_exe_result);
         return NULL;
@@ -192,7 +195,7 @@ void sig_handler(int signo, siginfo_t *si, void *data) {
   printf("AAA Signal %d from pid %d\n", (int)si->si_signo, pid);
   char cmd[999];
   sprintf(cmd, "ps -p %d -o comm= ", pid);
-  printf("system return %d\n", system(cmd));
+  printf("system() return %d\n", system(cmd));
   exit(0);
 }
 
@@ -224,6 +227,9 @@ int set_up_sandbox(int pipefd) {
         sa.sa_sigaction = sig_handler;
         if (sigaction(i, &sa, 0) == -1) {
             fprintf(stderr, "AAA %s: %s\n", "sigaction", strerror(errno));
+        }
+        else {
+            fprintf(stderr, "%s success for signal %d\n", "sigaction", i);
         }
     }
 

@@ -195,9 +195,25 @@ void sig_handler(int signo, siginfo_t *si, void *data) {
   (void)data;
   int pid = si->si_pid;
   fprintf(stderr, "AAA Signal %d from pid %d\n", (int)si->si_signo, pid);
+
   char cmd[999];
-  sprintf(cmd, "ps -p %d -o comm= ", pid);
-  fprintf(stderr, "system() return %d\n", system(cmd));
+  sprintf(cmd, "/bin/ps -p %d -o comm= ", pid);
+
+  FILE *fp;
+  char tmp[9999];
+
+  fp = popen(cmd, "r");
+  if (fp == NULL) {
+    fprintf(stderr, "Failed to run command\n");
+    exit(1);
+  }
+
+  while (fgets(tmp, sizeof(tmp)-1, fp) != NULL) {
+    fprintf(stderr, "process info: %s", tmp);
+  }
+  pclose(fp);
+
+
   exit(0);
 }
 

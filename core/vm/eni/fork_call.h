@@ -234,8 +234,8 @@ int set_up_sandbox(int pipefd) {
             if (close(i) == -1)
                 return ENI_RESOURCE_BUSY;
     }*/
-    //if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT) != 0)
-    //    return ENI_SECCOMP_FAIL;
+    if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT) != 0)
+        return ENI_SECCOMP_FAIL;
 
     for (int i = 1 ; i < 128 ; i++) {
         struct sigaction sa;
@@ -325,6 +325,11 @@ eni_return_data wait_and_read_from_child(int pid, int pfd, int* eni_status) {
             continue;
         }
         else if (nread == 0) { // EOF
+            struct timespec tim;
+            tim.tv_sec  = 0;
+            tim.tv_nsec = 100000000L; // 0.1 second
+            nanosleep(&tim, NULL);
+
             goto end;
         }
         else { // EAGAIN

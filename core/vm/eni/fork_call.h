@@ -173,9 +173,11 @@ eni_return_data fork_call(
                 *status = ENI_FAILURE;
                 fprintf(stderr, "ENI_FAILURE AAA %d AAA\n", __LINE__);
                 fprintf(stderr, "signal = %s\n", strsignal(sig));
-                fprintf(stderr, "regard it as normal termination anyway.\n");
-                *status = ENI_SUCCESS;
-                return child_exe_result;
+                fprintf(stderr, "strlen(child_exe_result) = %d\n", strlen(child_exe_result));
+                fprintf(stderr, "child_exe_result = %s\n", child_exe_result);
+                // fprintf(stderr, "regard it as normal termination anyway.\n");
+                // *status = ENI_SUCCESS;
+                // return child_exe_result;
         }
         free(child_exe_result);
         return NULL;

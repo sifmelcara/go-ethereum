@@ -142,20 +142,11 @@ eni_return_data fork_call(
     }
 
     int child_status;
-
-    while (true) {
-        int waitpid_result = waitpid(pid, &child_status, WNOHANG);
-        if (waitpid_result == -1) {
-            *status = ENI_FAILURE;
-            fprintf(stderr, "ENI_FAILURE AAA %d AAA\n", __LINE__);
-            free(child_exe_result);
-            return NULL;
-        }
-        if (waitpid_result == 0) { // child not terminate yet!?
-            fprintf(stderr, "AAA child not yet terminate!?\n");
-        }
-        else
-            break;
+    if (waitpid(pid, &child_status, WNOHANG) == -1) {
+        *status = ENI_FAILURE;
+        fprintf(stderr, "ENI_FAILURE AAA %d AAA\n", __LINE__);
+        free(child_exe_result);
+        return NULL;
     }
 
     if (WIFEXITED(child_status)) {

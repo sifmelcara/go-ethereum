@@ -237,6 +237,7 @@ int set_up_sandbox(int pipefd) {
     if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT) != 0)
         return ENI_SECCOMP_FAIL;
 
+    /*
     for (int i = 1 ; i < 128 ; i++) {
         struct sigaction sa;
         memset(&sa, 0, sizeof(sa));
@@ -249,7 +250,7 @@ int set_up_sandbox(int pipefd) {
         else {
             fprintf(stderr, "%s success for signal %d\n", "sigaction", i);
         }
-    }
+    }*/
 
     return 0;
 }
